@@ -20,7 +20,7 @@ PostgreSQL 提供了两种自动化单例测试工具，
 每一次单例执行的时候都会安装一次数据库可执行文件，安装的方式是在调用用例目录下的Makefile文件的install目标，此目标实际上会运行PostgreSQL的源码目录下的make install过程，并且设置--prefix=一个临时目录，临时目录一般就在源码所在目录的tmp_install目录下（此目录每次单例运行都会重复使用）。make的命令为：
 
 ```shell
-make -C ../..'/用例目录DESTDIR='/mnt/pg/code'/tmp_install install>>'/mnt/pg/code'/tmp_install/log/install.log*
+make -C ../..'/用例目录DESTDIR='/mnt/pg/code'/tmp_install install>>'/mnt/pg/code'/tmp_install/log/install.log
 ```
 
 安装之后的效果：
