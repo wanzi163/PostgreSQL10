@@ -414,6 +414,8 @@ check-**目录名-recurse: temp-install
 
 在./src/test目录下运行make check，就会实际上运行几个子目录下的make check
 
+## 3.3  模块和使用的单例工具对照
+
 如下两个模块使用了pg_isolation_regress的工具
 
 `isolation`, `modules/brin`
