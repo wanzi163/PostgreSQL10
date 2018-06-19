@@ -54,7 +54,7 @@ postgres <-D 数据目录> <其他参数> < /dev/null   对于最后为何使用
 
 ## do_kill()
 
-是kill函数对init进程进行发送signal的操作，要是用的signal也要在命令行提供。
+是kill函数对init进程进行发送signal的操作，要是用的signal也要在命令行提供, 此参数就是跟随者kill操作参数的后面。
 
 ## do_restart()
 
