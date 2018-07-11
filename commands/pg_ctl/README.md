@@ -25,17 +25,21 @@
 命令举例
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile init`
 
-调用initdb，然后把自己的命令行指定的参数传递给initdb，比如-D参数参数指定的数据目录
+初始化原始的数据文件，调用initdb，然后把自己的命令行指定的参数传递给initdb，比如-D参数参数指定的数据目录。
+实际上初始化操作很少会使用pg_ctl这个工具入口来做，一般都是直接运行initdb命令进行初始化。（参考另外一篇关于initdb的原理）
 
 ## do_status()
 
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile status`
 
+查看当前此数据目录对应的数据库进程实例的状态。
 查看数据目录下的postmaster.pid文件，获取第一行的进程id(pid)，然后用kill(pid, 0)来判断进程是否是alive，如果是的话，那么打印进程还活着，读取postmaster.opts文件，读取每一行（实际上只有一行），打印的是启动postgresql的时候使用的命令行（包括所有的实用的参数）
 
 ## do_start()
 
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile start`
+
+启动数据库
 
 首先会检查是否已经有了一个正在用此数据目录来运行的数据库运行实例，检查凡事就是看数据录下是否已经有了postmaster.pid文件，并且里面记录和一个合法的进程id，如果是的话，那么就会认为是可能还有一个数据库实例再运行。但是不管如何，都会尝试启动，后续的启动可能会因为端口号被占用而失败，但是这里实际上并不会让其失败，因为此环节不方便去检查当前实例所使用的端口号是否在系统中已经被使用了，这种方法也是一种平衡，因为没有必要在这里做这么复杂的检查，后续的失败也很快就会在启动的一开始就会发生。
 
@@ -54,7 +58,11 @@ postgres <-D 数据目录> <其他参数> < /dev/null   对于最后为何使用
 最后判断是否参数中设置了等待启动结束（指定了--wait/-w参数），如果没有的话，那么直接打印“server starting”，然后退出，否者，等待在那里。
 
 ## do_stop()
+
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile stop`
+
+停止正在运行的数据库进程实例
+
 获取postgresq的linit进程的pid，方法是在数据目录下的postmaster.pid文件中找到init进程的进程id。使用kill函数和命令行指定的signal去发送信号给init进程，具体使用哪一种信号，是在命令行的--mode/-m参数中提供的，映射关系请参考do_restart()章节
 
 如果使用了等待的参数（使用了--wait/-w参数），那么会一直的检查postmaster.pid文件，如果这个文件存在，那么就认为postgresql还没有结束，如果postmaster.pid文件不存在了，那么就认为postgresql停掉了。
@@ -65,12 +73,16 @@ postgres <-D 数据目录> <其他参数> < /dev/null   对于最后为何使用
 
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile kill <信号名>`
 
+对正在运行数据库进程发送信号，不同的信号在进程中有不同的行为，会在其他文章中进行介绍。
+
 是kill函数对init进程进行发送signal的操作，要是用的signal也要在命令行提供, 此参数就是跟随者kill操作参数的后面。
 可选的信号名有, HUP,INT,QUIT,ABRT,KILL,TERM,USR1,USR2。
 
 ## do_restart()
 
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile restart`
+
+重新启动数据库，重启进程，（进程号都会发生改变）
 
 实际上整个过程就是kill掉init进程，然后调用do_start()来启动数据库，可以知道的是，所有进程都会经历删除和重新创建的过程。
 
@@ -80,11 +92,14 @@ postgres <-D 数据目录> <其他参数> < /dev/null   对于最后为何使用
 
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile reload`
 
+重新加载配置项，不重启进程 （进程号不变）
 实际上就是给init进程发送了SIGHUP系统信号，和restart不同的是，reload忽略掉--mode/-m参数提供的任何信号相关的信息，而且不会做wait操作，忽略掉--wait和--do_wait参数。
 
 ## do_promote()
 
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile promote`
+
+升级拥有当前数据库实例为集群中的主节点。（直接运行升级主节点是危险的，可能会发生“脑裂”，即多个主节点，的可能，需要配合其他一致性工具来完成升级操作）
 
 在数据目录下生成一个promote文件（空文件），然后想init进程发送一个SIGUSR1的信号，等待系统的状态变成DB_IN_PRODUCTION（数据来源于pg_control文件）
 
