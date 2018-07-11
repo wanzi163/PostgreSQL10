@@ -33,6 +33,7 @@
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile status`
 
 查看当前此数据目录对应的数据库进程实例的状态。
+
 查看数据目录下的postmaster.pid文件，获取第一行的进程id(pid)，然后用kill(pid, 0)来判断进程是否是alive，如果是的话，那么打印进程还活着，读取postmaster.opts文件，读取每一行（实际上只有一行），打印的是启动postgresql的时候使用的命令行（包括所有的实用的参数）
 
 ## do_start()
@@ -93,6 +94,7 @@ postgres <-D 数据目录> <其他参数> < /dev/null   对于最后为何使用
 `pg_ctl -D /mnt/study/pg/data -l /mnt/study/log/logfile reload`
 
 重新加载配置项，不重启进程 （进程号不变）
+
 实际上就是给init进程发送了SIGHUP系统信号，和restart不同的是，reload忽略掉--mode/-m参数提供的任何信号相关的信息，而且不会做wait操作，忽略掉--wait和--do_wait参数。
 
 ## do_promote()
