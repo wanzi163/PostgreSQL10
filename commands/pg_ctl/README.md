@@ -7,7 +7,7 @@
 - --help -h 打印帮助信息
 - --version -V 打印数据库版本信息
 - --log -l <日志文件目录> 指定日志文件
-- --mode -m <模式符号>  s/smart 指定的是SMART_MODE，f/fast指定的是FAST_MODE（默认），i/immediate指定的是IMMEDIATE_MODE，但是这些mode到底是什么用途，现在还不能知道。
+- --mode -m <模式符号>  s/smart 指定的是SMART_MODE，f/fast指定的是FAST_MODE（默认），i/immediate指定的是IMMEDIATE_MODE，但是这些mode到底是什么用途，需要在其他文章中进行介绍。
 - --pgdata -D 这个参数是最关键的参数，指定我们初始化的数据的目录，这个是一个必须的参数
 - --options -o 选项列表，可以支持多个这样的参数，最后会把所有的选项用空格连起来
 - --silent -s 安静模式，一般指不打印任何的日志
